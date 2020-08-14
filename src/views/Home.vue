@@ -3,60 +3,71 @@
     <div class="container">
       <FullCalendar :options="calendarOptions" />
     </div>
+      <b-modal :active.sync="appointmentModal"
+        has-modal-card
+        trap-focus
+        :destroy-on-hide="false"
+        aria-role="dialog"
+        aria-modal>
+        Hello
+    </b-modal>
   </div>
 </template>
 
 <script>
 import FullCalendar from '@fullcalendar/vue'
-import dayGridPlugin from '@fullcalendar/daygrid'
+import resourceTimeGridPlugin from '@fullcalendar/resource-timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
-import resourceTimelinePlugin from '@fullcalendar/resource-timeline'
+
+var Acuity = require('acuityscheduling')
 
 export default {
   name: 'Home',
   data () {
     return {
+      appointmentModal: false,
       calendarOptions: {
-        plugins: [dayGridPlugin, interactionPlugin, resourceTimelinePlugin],
-        initialView: 'resourceTimeline',
+        plugins: [interactionPlugin, resourceTimeGridPlugin],
+        initialView: 'resourceTimeGridDay',
         headerToolbar: {
           left: 'today prev,next',
-          center: 'title',
-          right: 'resourceTimelineDay,resourceTimelineWeek'
+          center: 'title'
+        },
+        dateClick: function (info) {
+          this.appointmentModal = true
+        },
+        select: function (info) {
+          alert('selected ' + info.startStr + ' to ' + info.endStr)
         },
         resources: [
-          { id: 'a', building: '460 Bryant', title: 'Auditorium A' },
-          { id: 'b', building: '460 Bryant', title: 'Auditorium B' },
-          { id: 'c', building: '460 Bryant', title: 'Auditorium C' },
-          { id: 'd', building: '460 Bryant', title: 'Auditorium D' },
-          { id: 'e', building: '460 Bryant', title: 'Auditorium E' },
-          { id: 'f', building: '460 Bryant', title: 'Auditorium F' },
-          { id: 'g', building: '564 Pacific', title: 'Auditorium G' },
-          { id: 'h', building: '564 Pacific', title: 'Auditorium H' },
-          { id: 'i', building: '564 Pacific', title: 'Auditorium I' },
-          { id: 'j', building: '564 Pacific', title: 'Auditorium J' },
-          { id: 'k', building: '564 Pacific', title: 'Auditorium K' },
-          { id: 'l', building: '564 Pacific', title: 'Auditorium L' },
-          { id: 'm', building: '564 Pacific', title: 'Auditorium M' },
-          { id: 'n', building: '564 Pacific', title: 'Auditorium N' },
-          { id: 'o', building: '101 Main St', title: 'Auditorium O' },
-          { id: 'p', building: '101 Main St', title: 'Auditorium P' },
-          { id: 'q', building: '101 Main St', title: 'Auditorium Q' },
-          { id: 'r', building: '101 Main St', title: 'Auditorium R' },
-          { id: 's', building: '101 Main St', title: 'Auditorium S' },
-          { id: 't', building: '101 Main St', title: 'Auditorium T' },
-          { id: 'u', building: '101 Main St', title: 'Auditorium U' },
-          { id: 'v', building: '101 Main St', title: 'Auditorium V' },
-          { id: 'w', building: '101 Main St', title: 'Auditorium W' },
-          { id: 'x', building: '101 Main St', title: 'Auditorium X' },
-          { id: 'y', building: '101 Main St', title: 'Auditorium Y' },
-          { id: 'z', building: '101 Main St', title: 'Auditorium Z' }
+          { id: 'a', title: 'Room A' },
+          { id: 'b', title: 'Room B' },
+          { id: 'c', title: 'Room C' },
+          { id: 'd', title: 'Room D' }
         ]
       }
     }
   },
   components: {
     FullCalendar
+  },
+  methods: {
+    fetchAppointments () {
+      var userId = '20222948'
+      var apiKey = '3e13d7077d8f622d5831ba67352be692'
+      var acuity = Acuity.basic({
+        userId: userId,
+        apiKey: apiKey
+      })
+
+      acuity.request('/appointments', function (err, res, appointments) {
+        if (err) return console.error(err)
+        console.log(appointments)
+      })
+    }
+  },
+  mounted () {
+    this.fetchAppointments()
   }
 }
 </script>
