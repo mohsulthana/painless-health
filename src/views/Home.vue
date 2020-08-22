@@ -105,12 +105,14 @@ import FullCalendar from '@fullcalendar/vue'
 import resourceTimeGridPlugin from '@fullcalendar/resource-timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import dayGridPlugin from '@fullcalendar/daygrid'
+import momentTZ from 'moment-timezone'
 
 export default {
   name: 'Home',
   data () {
     return {
       formValues: {},
+      timeZone: momentTZ.tz.names(),
       appointmentModal: false,
       resourceView: {
         selectable: true,
