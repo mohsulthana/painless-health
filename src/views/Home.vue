@@ -1,43 +1,101 @@
 <template>
   <div class="flex mb-4">
-    <div class="w-1/3 h-12 p-3">
-      <FullCalendar ref="fullCalendar" :options="calendarOption" />
+    <div class="w-1/3 pt-6 h-12 p-3">
+      <FullCalendar class="fullCalendar" ref="fullCalendar" :options="calendarOption" />
     </div>
-    <div class="w-2/3 p-3 h-12">
-      <FullCalendar ref="resourceView" :options="resourceView" />
+    <div class="w-2/3 pt-6 px-6 h-12">
+      <FullCalendar class="resourceView" ref="resourceView" :options="resourceView" />
     </div>
 
-    <div class="modal opacity-0 pointer-events-none fixed w-full h-full top-0 left-0 flex items-center justify-center">
-      <div class="modal-overlay absolute w-full h-full bg-gray-900 opacity-50"></div>
-        <div class="modal-container bg-white w-11/12 md:max-w-md mx-auto rounded shadow-lg z-50 overflow-y-auto">
-        <div class="modal-close absolute top-0 right-0 cursor-pointer flex flex-col items-center mt-4 mr-4 text-white text-sm z-50"></div>
-        <!-- Add margin if you want to see some of the overlay behind the modal-->
-        <div class="modal-content py-4 text-left px-6">
-          <!--Title-->
-          <div class="flex justify-between items-center pb-3">
-            <p class="text-2xl font-bold">Simple Modal!</p>
-            <div class="modal-close cursor-pointer z-50">
-              <svg class="fill-current text-black" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18">
-                <path d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z"></path>
-              </svg>
-            </div>
+    <div v-if="appointmentModal" class="overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center flex">
+      <div class="relative w-auto my-6 mx-auto max-w-12xl">
+        <!--content-->
+        <div class="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
+          <!--header-->
+          <div class="flex items-start justify-between p-5 border-b border-solid border-gray-300 rounded-t">
+            <h3 class="text-3xl font-semibold">
+              Modal Title
+            </h3>
+            <button class="p-1 ml-auto bg-transparent border-0 text-black opacity-5 float-right text-3xl leading-none font-semibold outline-none focus:outline-none" v-on:click="appointmentModal = !appointmentModal">
+              <span class="bg-transparent text-black opacity-5 h-6 w-6 text-2xl block outline-none focus:outline-none">
+                ×
+              </span>
+            </button>
           </div>
-
-          <!--Body-->
-          <p>Modal content can go here</p>
-          <p>...</p>
-          <p>...</p>
-          <p>...</p>
-          <p>...</p>
-
-          <!--Footer-->
-          <div class="flex justify-end pt-2">
-            <button class="px-4 bg-transparent p-3 rounded-lg text-indigo-500 hover:bg-gray-100 hover:text-indigo-400 mr-2">Action</button>
-            <button class="modal-close px-4 bg-indigo-500 p-3 rounded-lg text-white hover:bg-indigo-400">Close</button>
+          <!--body-->
+            <div class="p-6">
+              <FormulateForm
+                class="login-form"
+                values="formValues"
+                >
+               <h2 class="form-title">Client Name</h2>
+                  <FormulateInput
+                    input-class="w-full px-3 py-2 border border-gray-400 border-box rounded leading-none focus:border-green-500 outline-none"
+                  />
+                  <FormulateInput
+                    input-class="w-full px-3 py-2 border border-gray-400 border-box rounded leading-none focus:border-green-500 outline-none"
+                    :options="{first: 'First', second: 'Second', third: 'Third', fourth: 'Fourth'}"
+                    type="select"
+                    placeholder="Choose appointment type"
+                    label="Which of your children is your favorite?"
+                  />
+                <h2 class="form-title">Forms and Notes</h2>
+                <FormulateInput
+                  input-class="w-full px-3 py-2 border border-gray-400 border-box rounded leading-none focus:border-green-500 outline-none"
+                  type="textarea"
+                  placeholder="Private notes about appointment"
+                  label="NOTES"
+                  validation="required|max:50,length"
+                  error-behavior="live"
+                />
+                <FormulateInput
+                  type="date"
+                  name="sample"
+                  input-class="w-full px-3 py-2 border border-gray-400 border-box rounded leading-none focus:border-green-500 outline-none"
+                  label="Date of Birth"
+                  placeholder="mm/dd/yyy"
+                  validation="required|after:1945-01-01"
+                  min="2018-12-01"
+                  max="2021-01-01"
+                  error-behavior="live"
+                />
+                <FormulateInput
+                  input-class="w-full px-3 py-2 border border-gray-400 border-box rounded leading-none focus:border-green-500 outline-none"
+                  :options="{first: 'Uninsured', second: 'Private Health Cover', third: 'Worker\'s Compensation', fourth: 'Department of Veteran Affairs', fifth: 'Garrison Health', sixth: 'Motor Vehicle Accident Insurance'}"
+                  type="select"
+                  label="Health cover"
+                />
+                <FormulateInput
+                  input-class="w-full px-3 py-2 border border-gray-400 border-box rounded leading-none focus:border-green-500 outline-none"
+                  :options="{first: 'Cottesloe Practice', second: 'Virtual Consult'}"
+                  type="select"
+                  label="Location"
+                />
+                <FormulateInput
+                  :options="{first: 'yes', second: 'no'}"
+                  type="radio"
+                  label="Do you require wheelchair access?"
+                />
+                <FormulateInput
+                  :options="{first: 'yes', second: 'no'}"
+                  type="radio"
+                  label="Do you have a referral?"
+                />
+              </FormulateForm>
+            </div>
+          <!--footer-->
+          <div class="flex items-center justify-end p-6 border-t border-solid border-gray-300 rounded-b">
+            <button class="text-red-500 bg-transparent border border-solid border-red-500 hover:bg-red-500 hover:text-white active:bg-red-600 font-bold uppercase text-sm px-6 py-3 rounded outline-none focus:outline-none mr-1 mb-1" type="button" style="transition: all .15s ease" v-on:click="appointmentModal = !appointmentModal">
+              Close
+            </button>
+            <button class="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1" type="button" style="transition: all .15s ease" v-on:click="appointmentModal = !appointmentModal">
+              Save Changes
+            </button>
           </div>
         </div>
       </div>
     </div>
+    <div v-if="appointmentModal" class="opacity-25 fixed inset-0 z-40 bg-black"></div>
   </div>
 </template>
 
@@ -52,22 +110,17 @@ export default {
   name: 'Home',
   data () {
     return {
+      formValues: {},
       appointmentModal: false,
       resourceView: {
-        headerToolbar: {
-          left: 'prev,next today',
-          center: 'title',
-          right: 'dayGridMonth,timeGridWeek,timeGridDay'
-        },
+        selectable: true,
         plugins: [interactionPlugin, resourceTimeGridPlugin],
         initialView: 'resourceTimeGridDay',
-        dateClick: function (info) {
-          this.appointmentModal = true
+        dateClick: (info) => {
+          this.appointmentModal = !this.appointmentModal
         },
-        select: function (info) {
-          alert('selected ' + info.startStr + ' to ' + info.endStr)
-        },
-        resources: []
+        resources: [],
+        events: []
       },
       calendarOption: {
         navLinks: true,
@@ -76,6 +129,9 @@ export default {
         navLinkDayClick: (date, jsEvent) => {
           const calendarApi = this.$refs.resourceView.getApi()
           calendarApi.gotoDate(date)
+        },
+        eventRender: (info) => {
+          console.log(info)
         }
       }
     }
@@ -87,11 +143,10 @@ export default {
     fetchAppointments () {
       axios.get('http://127.0.0.1:8000/appointments')
         .then((response) => {
-          response.data.slice(-5).forEach((value, index) => {
-            console.log(value)
+          response.data.slice(-20).forEach((value, index) => {
             var name = `${value.firstName} ${value.lastName}`
-            this.resourceView.resources.push({ title: name })
-            this.resourceView.events.push({ start: value.date })
+            this.resourceView.resources.push({ title: name, id: value.id })
+            this.resourceView.events.push({ resourceId: value.id, title: value.type, start: '2020-08-19T10:30:00+00:00', end: '2020-08-19T12:30:00+00:00' })
           })
         })
         .catch((error) => {
@@ -105,9 +160,45 @@ export default {
 }
 </script>
 
-<style>
-.fc .fc-col-header-cell-cushion {
-  display: inline-block;
-  padding: 2px 4px;
+<style lang="scss">
+.fullCalendar.fc {
+  .fc-col-header-cell-cushion {
+    display: inline-block;
+    padding: 2px 2px;
+  }
+  .fc-daygrid-day-number {
+    margin: auto;
+    position: absolute;
+    top: 0; left: 0; bottom: 0; right: 0;
+    text-align: center;
+  }
+  td, th, table {
+    border-style: none !important;
+  }
+  .vc-day-content {
+    background-color: #DD6B20;
+  }
+  table td a {
+    font-size: 14px;
+  }
 }
+
+#calendar {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+//Styles added to show Horizontal Scroll Bar
+.fc-view-container {
+  width: auto;
+}
+
+.fc-view-container .fc-view {
+  overflow-x: scroll;
+}
+
+.fc-view-container .fc-view > table {
+  width: 2500px;
+}
+
 </style>
