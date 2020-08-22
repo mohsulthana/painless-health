@@ -143,11 +143,10 @@ export default {
     fetchAppointments () {
       axios.get('http://127.0.0.1:8000/appointments')
         .then((response) => {
-          response.data.slice(-5).forEach((value, index) => {
+          response.data.slice(-20).forEach((value, index) => {
             var name = `${value.firstName} ${value.lastName}`
             this.resourceView.resources.push({ title: name, id: value.id })
             this.resourceView.events.push({ resourceId: value.id, title: value.type, start: '2020-08-19T10:30:00+00:00', end: '2020-08-19T12:30:00+00:00' })
-            console.log(this.resourceView.events)
           })
         })
         .catch((error) => {
@@ -161,27 +160,45 @@ export default {
 }
 </script>
 
-<style>
-.fullCalendar .fc .fc-col-header-cell-cushion {
-  display: inline-block;
-  padding: 2px 4px;
-}
-.fc .fc-daygrid-day-number {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  text-align: center;
-  padding: 0px;
-}
-.fullCalendar .fc td, .fc th {
-  border-style: none !important;
-}
-/* .fc .fc-daygrid-day.fc-day-today {
-  border-radius: 360000000px;
-} */
-/*.vc-text-sm {
+<style lang="scss">
+.fullCalendar.fc {
+  .fc-col-header-cell-cushion {
+    display: inline-block;
+    padding: 2px 2px;
+  }
+  .fc-daygrid-day-number {
+    margin: auto;
+    position: absolute;
+    top: 0; left: 0; bottom: 0; right: 0;
+    text-align: center;
+  }
+  td, th, table {
+    border-style: none !important;
+  }
+  .vc-day-content {
+    background-color: #DD6B20;
+  }
+  table td a {
     font-size: 14px;
-} */
+  }
+}
+
+#calendar {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+//Styles added to show Horizontal Scroll Bar
+.fc-view-container {
+  width: auto;
+}
+
+.fc-view-container .fc-view {
+  overflow-x: scroll;
+}
+
+.fc-view-container .fc-view > table {
+  width: 2500px;
+}
+
 </style>
