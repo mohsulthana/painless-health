@@ -5,6 +5,8 @@ import './registerServiceWorker'
 import router from './router'
 import store from './store'
 import './main.css'
+import './assets/tailwind.css'
+import './assets/main.scss'
 
 Vue.use(VueFormulate)
 

@@ -1,101 +1,113 @@
 <template>
-  <div class="flex mb-4">
-    <div class="w-1/3 pt-6 h-12 p-3">
+  <div class="grid grid-cols-10 gap-4">
+    <div class="col-span-3 bg-gray-200 py-8 px-4">
       <FullCalendar class="fullCalendar" ref="fullCalendar" :options="calendarOption" />
     </div>
-    <div class="w-2/3 pt-6 px-6 h-12">
+    <div class="col-span-7 py-8 px-4">
       <FullCalendar class="resourceView" ref="resourceView" :options="resourceView" />
     </div>
-
-    <div v-if="appointmentModal" class="overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center flex">
-      <div class="relative w-auto my-6 mx-auto max-w-12xl">
-        <!--content-->
-        <div class="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
-          <!--header-->
-          <div class="flex items-start justify-between p-5 border-b border-solid border-gray-300 rounded-t">
-            <h3 class="text-3xl font-semibold">
-              Modal Title
-            </h3>
-            <button class="p-1 ml-auto bg-transparent border-0 text-black opacity-5 float-right text-3xl leading-none font-semibold outline-none focus:outline-none" v-on:click="appointmentModal = !appointmentModal">
-              <span class="bg-transparent text-black opacity-5 h-6 w-6 text-2xl block outline-none focus:outline-none">
-                ×
-              </span>
-            </button>
-          </div>
-          <!--body-->
-            <div class="p-6">
-              <FormulateForm
-                class="login-form"
-                values="formValues"
-                >
-               <h2 class="form-title">Client Name</h2>
-                  <FormulateInput
-                    input-class="w-full px-3 py-2 border border-gray-400 border-box rounded leading-none focus:border-green-500 outline-none"
-                  />
-                  <FormulateInput
-                    input-class="w-full px-3 py-2 border border-gray-400 border-box rounded leading-none focus:border-green-500 outline-none"
-                    :options="{first: 'First', second: 'Second', third: 'Third', fourth: 'Fourth'}"
-                    type="select"
-                    placeholder="Choose appointment type"
-                    label="Which of your children is your favorite?"
-                  />
-                <h2 class="form-title">Forms and Notes</h2>
-                <FormulateInput
-                  input-class="w-full px-3 py-2 border border-gray-400 border-box rounded leading-none focus:border-green-500 outline-none"
-                  type="textarea"
-                  placeholder="Private notes about appointment"
-                  label="NOTES"
-                  validation="required|max:50,length"
-                  error-behavior="live"
-                />
-                <FormulateInput
-                  type="date"
-                  name="sample"
-                  input-class="w-full px-3 py-2 border border-gray-400 border-box rounded leading-none focus:border-green-500 outline-none"
-                  label="Date of Birth"
-                  placeholder="mm/dd/yyy"
-                  validation="required|after:1945-01-01"
-                  min="2018-12-01"
-                  max="2021-01-01"
-                  error-behavior="live"
-                />
-                <FormulateInput
-                  input-class="w-full px-3 py-2 border border-gray-400 border-box rounded leading-none focus:border-green-500 outline-none"
-                  :options="{first: 'Uninsured', second: 'Private Health Cover', third: 'Worker\'s Compensation', fourth: 'Department of Veteran Affairs', fifth: 'Garrison Health', sixth: 'Motor Vehicle Accident Insurance'}"
-                  type="select"
-                  label="Health cover"
-                />
-                <FormulateInput
-                  input-class="w-full px-3 py-2 border border-gray-400 border-box rounded leading-none focus:border-green-500 outline-none"
-                  :options="{first: 'Cottesloe Practice', second: 'Virtual Consult'}"
-                  type="select"
-                  label="Location"
-                />
-                <FormulateInput
-                  :options="{first: 'yes', second: 'no'}"
-                  type="radio"
-                  label="Do you require wheelchair access?"
-                />
-                <FormulateInput
-                  :options="{first: 'yes', second: 'no'}"
-                  type="radio"
-                  label="Do you have a referral?"
-                />
-              </FormulateForm>
+    <div v-if="createAppointmentModal"
+      class="fixed overflow-x-hidden overflow-y-auto inset-0 my-5 justify-center items-center z-50">
+        <div class="relative mx-auto w-full max-w-6xl">
+            <div class="bg-white w-full rounded-none shadow-2xl p-6 flex flex-col">
+              <div class="text-2xl mb-5 text-left">Add new appointment</div>
+                <div class="flex px-2">
+                  <div class="w-full px-4 mb-6 md:mb-0">
+                    <div class="relative mb-2">
+                      <label class="block text-primary text-sm text-left font-bold mb-2" for="appointmentType">
+                        Appointment Type with {{doctor}}
+                      </label>
+                      <select v-model="forms.appointmentTypeID" class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-state">
+                        <option v-for="type in filteredAppointmentType" :key="type.id" :value="type.id">{{ `${type.name} (${type.duration} minutes)` }}</option>
+                      </select>
+                      <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                      </div>
+                    </div>
+                    <div class="relative mb-2">
+                      <label class="block text-primary text-sm text-left font-bold mb-2" for="firstName">
+                        Date
+                      </label>
+                      <FormulateInput
+                        type="date"
+                        v-model="forms.date"
+                        class="appearance-none block w-full text-black border-primary rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
+                        placeholder="Sample date placeholder"
+                      />
+                    </div>
+                    <div class="relative mb-2">
+                      <label class="block text-primary text-sm text-left font-bold mb-2" for="firstName">
+                        Time
+                      </label>
+                      <FormulateInput
+                        type="time"
+                        v-model="forms.time"
+                        class="appearance-none block w-full text-black border-primary rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
+                        name="sample"
+                        placeholder="Sample time placeholder"
+                      />
+                    </div>
+                    <div class="relative mb-2">
+                      <label class="block text-primary text-sm text-left font-bold mb-2" for="firstName">
+                        First Name *
+                      </label>
+                      <input v-model="forms.firstName" class="appearance-none block w-full bg-gray-200 text-gray-700 border border-input rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white" id="grid-first-name" type="text" placeholder="Jane">
+                    </div>
+                    <div class="relative mb-2">
+                      <label class="block text-primary text-sm text-left font-bold mb-2" for="lastName">
+                        Last Name *
+                      </label>
+                      <input v-model="forms.lastName" class="appearance-none block w-full bg-gray-200 text-gray-700 border border-input rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white" id="grid-first-name" type="text" placeholder="Jane">
+                    </div>
+                    <div class="relative mb-2">
+                      <label class="block text-primary text-sm text-left font-bold mb-2" for="phone">
+                        Phone
+                      </label>
+                      <input v-model="forms.phone" class="appearance-none block w-full bg-gray-200 text-gray-700 border border-input rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white" id="grid-first-name" type="text" placeholder="Jane">
+                    </div>
+                    <div class="relative mb-2">
+                      <p class="text-left">{{ timeChoosen }}</p>
+                    </div>
+                    <div class="relative mb-2">
+                      <label class="block text-primary text-sm text-left font-bold mb-2" for="email">
+                        Email
+                      </label>
+                      <input v-model="forms.email" class="appearance-none block w-full bg-gray-200 text-gray-700 border border-input rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white" id="grid-first-name" type="text" placeholder="Jane">
+                    </div>
+                    <div class="relative mb-2">
+                      <label class="block text-primary text-sm text-left font-bold mb-2" for="notes">
+                        Notes
+                      </label>
+                      <textarea v-model="forms.notes" class="resize-x border w-full rounded focus:outline-none focus:shadow-outline"></textarea>
+                    </div>
+                  </div>
+                </div>
+              <button class="rounded-none border rloat-right top-0 bg-primary border-primary text-whitesmoke px-6 mt-1 py-2 m-auto mb-3" @click="submitAppointment()">Submit</button>
+              <button class="rounded-none float-right top-0 border bg-transparent border-primary text-primary px-6 mt-1 py-2 m-auto mb-3" @click="createAppointmentModal = false">Close</button>
             </div>
-          <!--footer-->
-          <div class="flex items-center justify-end p-6 border-t border-solid border-gray-300 rounded-b">
-            <button class="text-red-500 bg-transparent border border-solid border-red-500 hover:bg-red-500 hover:text-white active:bg-red-600 font-bold uppercase text-sm px-6 py-3 rounded outline-none focus:outline-none mr-1 mb-1" type="button" style="transition: all .15s ease" v-on:click="appointmentModal = !appointmentModal">
-              Close
-            </button>
-            <button class="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1" type="button" style="transition: all .15s ease" v-on:click="appointmentModal = !appointmentModal">
-              Save Changes
-            </button>
-          </div>
         </div>
-      </div>
     </div>
-    <div v-if="appointmentModal" class="opacity-25 fixed inset-0 z-40 bg-black"></div>
+    <div v-if="createAppointmentModal"
+      class="absolute z-40 inset-0 opacity-50 bg-black">
+    </div>
+
+    <div v-if="showAppointmentModal"
+      class="fixed overflow-x-hidden overflow-y-auto inset-0 flex justify-center items-center z-50">
+        <div class="relative mx-auto w-auto max-w-4xl">
+            <div class="bg-white w-full rounded-none shadow-2xl p-6 flex flex-col">
+              <div class="text-2xl mb-5 text-left">Title appointment</div>
+                <div class="flex px-2">
+                  Show
+                </div>
+              <button class="rounded border bg-primary border-primary text-whitesmoke px-6 mt-1 py-2 w-3/12 m-auto mb-3" @click="submitAppointment()">Submit</button>
+              <button class="rounded border bg-transparent border-primary text-primary px-6 mt-1 py-2 w-3/12 m-auto mb-3" @click="appointmentModal = false">Close</button>
+            </div>
+        </div>
+    </div>
+    <div
+      v-if="showAppointmentModal"
+      class="absolute z-40 inset-0 opacity-50 bg-black">
+    </div>
   </div>
 </template>
 
@@ -105,19 +117,42 @@ import FullCalendar from '@fullcalendar/vue'
 import resourceTimeGridPlugin from '@fullcalendar/resource-timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import dayGridPlugin from '@fullcalendar/daygrid'
+import momentTZ from 'moment-timezone'
+import moment from 'moment'
 
 export default {
   name: 'Home',
   data () {
     return {
+      appointmentType: [],
+      calendarID: '',
       formValues: {},
-      appointmentModal: false,
+      doctor: '',
+      time: '',
+      forms: {
+        firstName: '',
+        lastName: '',
+        time: '',
+        date: '',
+        phone: '',
+        email: '',
+        notes: '',
+        appointmentTypeID: ''
+      },
+      timeZone: momentTZ.tz.names(),
+      createAppointmentModal: false,
+      showAppointmentModal: false,
       resourceView: {
+        eventClick (event, jssEvent, view) {
+          this.showAppointmentModal = !this.showAppointmentModal
+        },
         selectable: true,
         plugins: [interactionPlugin, resourceTimeGridPlugin],
         initialView: 'resourceTimeGridDay',
         dateClick: (info) => {
-          this.appointmentModal = !this.appointmentModal
+          this.doctor = info.resource._resource.title
+          this.calendarID = info.resource._resource.extendedProps.calendarID
+          this.createAppointmentModal = !this.createAppointmentModal
         },
         resources: [],
         events: []
@@ -125,28 +160,70 @@ export default {
       calendarOption: {
         navLinks: true,
         plugins: [dayGridPlugin],
+        header: {
+          left: 'title',
+          center: '',
+          right: 'prev,next'
+        },
+        events: 'https://fullcalendar.io/demo-events.json',
         initialView: 'dayGridMonth',
         navLinkDayClick: (date, jsEvent) => {
           const calendarApi = this.$refs.resourceView.getApi()
           calendarApi.gotoDate(date)
         },
-        eventRender: (info) => {
+        eventRender: function (info) {
           console.log(info)
         }
       }
+    }
+  },
+  computed: {
+    filteredAppointmentType () {
+      return this.appointmentType.filter(item => item.calendarIDs.includes(this.calendarID))
+    },
+    timeChoosen (time) {
+      return moment(time).format('MMMM D YYYY, @ h:mm A')
     }
   },
   components: {
     FullCalendar
   },
   methods: {
-    fetchAppointments () {
-      axios.get('http://127.0.0.1:8000/appointments')
+    submitAppointment () {
+      const data = {
+        firstName: this.forms.firstName,
+        lastName: this.forms.lastName,
+        datetime: moment(`${this.forms.date} ${this.forms.time}`, 'YYYY-MM-DD HH:mm:ss').format(),
+        phone: this.forms.phone,
+        email: this.forms.email,
+        notes: this.forms.notes,
+        appointmentTypeID: this.forms.appointmentTypeID
+      }
+
+      axios.post('https://powerful-everglades-59936.herokuapp.com/appointments', data)
         .then((response) => {
-          response.data.slice(-20).forEach((value, index) => {
+          console.log(response)
+        })
+        .catch((error) => {
+          console.error(error)
+        })
+    },
+    fetchAppointmentsType () {
+      axios.get('https://powerful-everglades-59936.herokuapp.com/appointments-type')
+        .then((response) => {
+          this.appointmentType = [...new Set(response.data)]
+        })
+    },
+    fetchAppointments () {
+      axios.get('https://powerful-everglades-59936.herokuapp.com/appointments')
+        .then((response) => {
+          response.data.slice(-10).forEach((value, index) => {
             var name = `${value.firstName} ${value.lastName}`
-            this.resourceView.resources.push({ title: name, id: value.id })
-            this.resourceView.events.push({ resourceId: value.id, title: value.type, start: '2020-08-19T10:30:00+00:00', end: '2020-08-19T12:30:00+00:00' })
+            this.resourceView.resources.push({ title: name, id: value.id, calendarID: value.calendarID })
+            this.resourceView.events.push({ resourceId: value.id, title: value.type, start: '2020-09-03T10:30:00+00:00', end: '2020-09-03T12:30:00+00:00' })
+            this.$nextTick(() => {
+              this.fetchAppointmentsType()
+            })
           })
         })
         .catch((error) => {
@@ -175,11 +252,32 @@ export default {
   td, th, table {
     border-style: none !important;
   }
+  .vc-day {
+    font-weight: 500;
+  }
   .vc-day-content {
     background-color: #DD6B20;
   }
   table td a {
     font-size: 14px;
+  }
+
+  .fc-button .fc-icon {
+    font-size: 1.2rem;
+  }
+
+  // .fc-h-event {
+
+  // }
+
+  .fc-button-primary {
+    color: #718096;
+    background-color: transparent;
+    border-color: transparent;
+
+    &:hover {
+      background-color: #e2e8f0;
+    }
   }
 }
 
